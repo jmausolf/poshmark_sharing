@@ -1,4 +1,4 @@
-import selenium, time
+import selenium, time, argparse
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
@@ -103,7 +103,6 @@ def price_war():
 
 
         else:
-            print("[*] You are the price master! There are no current prices to beat.")
             pass
 
     #Save Changes
@@ -116,6 +115,10 @@ def price_war():
     driver.close()
 
 if __name__=="__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--time", default=900, type=float, help="time in seconds")
+    args = parser.parse_args()
+
     def deploy_price_war():
         print("[*] DEPLOYING PRICE WAR")
         try:
@@ -129,4 +132,4 @@ if __name__=="__main__":
     starttime=time.time()
     while True:
       deploy_price_war()
-      time.sleep(900 - ((time.time() - starttime) % 900))
+      time.sleep(args.time - ((time.time() - starttime) % args.time))

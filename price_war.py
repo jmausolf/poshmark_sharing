@@ -5,10 +5,6 @@ from selenium.webdriver.common.keys import Keys
 #Your Amazon Credentials File
 from credentials import *
 
-#Define URL and Web Driver
-driver = webdriver.Firefox()
-driver.implicitly_wait(0)
-
 
 def login():
     url = "https://sellercentral.amazon.com/inventory/ref=id_invmgr_dnav_xx_?tbla_myitable=sort:%7B%22sortOrder%22%3A%22DESCENDING%22%2C%22sortedColumnId%22%3A%22date%22%7D;search:;pagination:1;"
@@ -72,6 +68,8 @@ def save_changes():
     finally:
         pass
 
+
+
 ## MAIN FUNCTION TO RUN PRICE WAR
 
 def price_war():
@@ -101,18 +99,14 @@ def price_war():
             lower_price(inventory_item)
             print("...lowering price for item {}".format(index))
 
-
         else:
             pass
 
     #Save Changes
     save_changes()
     print("[*] Offered better prices for {} items in inventory. The price war is strong.".format(matches))
-    print("....the price war will continue in 15 minutes.")
-    time.sleep(5)
 
-    #Close Driver
-    driver.close()
+
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -121,15 +115,26 @@ if __name__=="__main__":
 
     def deploy_price_war():
         print("[*] DEPLOYING PRICE WAR")
+
         try:
             login()
             price_war()
         except:
-            print("[*] Error in Price War: Will Restart in One Hour...")
+            print("[*] Error in Price War")
             pass
+
+        print("....the price war will continue in {} minutes.".format(int(args.time/60)))
+
 
     #Start Price War Loop
     starttime=time.time()
     while True:
-      deploy_price_war()
-      time.sleep(args.time - ((time.time() - starttime) % args.time))
+        #Start Driver, Run, Close
+        driver = webdriver.Firefox()
+        driver.implicitly_wait(0)
+        deploy_price_war()
+        time.sleep(5)
+        driver.close()
+
+        #Time Delay: While Loop
+        time.sleep(args.time - ((time.time() - starttime) % args.time))

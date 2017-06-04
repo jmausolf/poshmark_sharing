@@ -33,10 +33,11 @@ def login():
 
     except:
         #Captcha Catch
-        import pdb; pdb.set_trace()
-        password = driver.find_element_by_name("password")
-        password.send_keys(amazon_password)
+        #import pdb; pdb.set_trace()
+        #password = driver.find_element_by_name("password")
+        #password.send_keys(amazon_password)
         #Enter Captcha
+        print("[*] Error in Price War: Thrwarted by Captchas")
 
 
 ## USER FUNCTIONS FOR PRICE CHANGES
@@ -128,7 +129,7 @@ if __name__=="__main__":
             login()
             price_war()
         except:
-            print("[*] Error in Price War: Thrwarted by Captchas")
+            print("[*] Error in Price War: Will Restart in One Hour")
             pass
 
     #Start Price War Loop

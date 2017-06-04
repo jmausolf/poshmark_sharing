@@ -1,6 +1,10 @@
 import selenium, time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+#from selenium.webdriver import ActionChains
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.remote.command import Command
+
 
 #Your Amazon Credentials File
 from credentials import *
@@ -57,8 +61,14 @@ def lower_price(inventory_item):
 
 
 def save_changes():
-    save_all = driver.find_element_by_link_text("Save all")
-    save_all.click()
+    try:
+        save_all = driver.find_element_by_link_text("Save all")
+        save_all.click()
+    except:
+        save_all = driver.find_element_by_xpath("//a[@id='a-autoid-2-announce-floating']")
+        save_all.click()
+    finally:
+        pass
 
 ## MAIN FUNCTION TO RUN PRICE WAR
 
@@ -91,10 +101,8 @@ def price_war():
             pass
 
     #Save Changes
-    import pdb; pdb.set_trace()
     save_changes()
     time.sleep(5)
-
 
     #Close Driver
     driver.close()

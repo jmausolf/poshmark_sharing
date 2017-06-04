@@ -1,18 +1,16 @@
 import selenium, time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.remote.command import Command
-
 
 #Your Amazon Credentials File
 from credentials import *
 
+#Define URL and Web Driver
+driver = webdriver.Firefox()
+driver.implicitly_wait(0)
+
 
 def login():
-    #Define URL and Web Driver
-    driver = webdriver.Firefox()
-    driver.implicitly_wait(0)
     url = "https://sellercentral.amazon.com/inventory/ref=id_invmgr_dnav_xx_?tbla_myitable=sort:%7B%22sortOrder%22%3A%22DESCENDING%22%2C%22sortedColumnId%22%3A%22date%22%7D;search:;pagination:1;"
     driver.get(url)
 
@@ -28,16 +26,10 @@ def login():
         time.sleep(5)
         password.send_keys(Keys.RETURN)
 
-        #Check If Passed Login
-        radio = driver.find_element_by_xpath("//div[@data-filter-id='Open']")
-
     except:
         #Captcha Catch
-        #import pdb; pdb.set_trace()
-        #password = driver.find_element_by_name("password")
-        #password.send_keys(amazon_password)
-        #Enter Captcha
         print("[*] Error in Price War: Thrwarted by Captchas")
+        pass
 
 
 ## USER FUNCTIONS FOR PRICE CHANGES
@@ -51,7 +43,7 @@ def match_prices(inventory_item):
             link.click()
             time.sleep(2)
         except:
-            print("exception")
+            print("...exception in price matching")
             pass
 
 
@@ -62,9 +54,8 @@ def beat_price(price):
 
 
 def lower_price(inventory_item):
-
     current_price = inventory_item.get_attribute('value')
-    print("Current price for item = ${}".format(current_price))
+    print("...current price for item = ${}".format(current_price))
     new_price = beat_price(current_price)
     inventory_item.clear()
     inventory_item.send_keys(new_price)
@@ -84,7 +75,6 @@ def save_changes():
 ## MAIN FUNCTION TO RUN PRICE WAR
 
 def price_war():
-
     #Select Only Active Inventory
     time.sleep(2)
     radio = driver.find_element_by_xpath("//div[@data-filter-id='Open']")
@@ -109,14 +99,17 @@ def price_war():
             #Select Inventory Item
             inventory_item = row.find_elements_by_xpath("//input[@maxlength='23']")[index]
             lower_price(inventory_item)
-            print("Lowering price for item {}".format(index))
+            print("...lowering price for item {}".format(index))
+
 
         else:
+            print("[*] You are the price master! There are no current prices to beat.")
             pass
 
     #Save Changes
     save_changes()
     print("[*] Offered better prices for {} items in inventory. The price war is strong.".format(matches))
+    print("....the price war will continue in 15 minutes.")
     time.sleep(5)
 
     #Close Driver
@@ -129,11 +122,11 @@ if __name__=="__main__":
             login()
             price_war()
         except:
-            print("[*] Error in Price War: Will Restart in One Hour")
+            print("[*] Error in Price War: Will Restart in One Hour...")
             pass
 
     #Start Price War Loop
     starttime=time.time()
     while True:
       deploy_price_war()
-      time.sleep(3600 - ((time.time() - starttime) % 3600))
+      time.sleep(900 - ((time.time() - starttime) % 900))

@@ -1,5 +1,3 @@
-
-
 import selenium, time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -7,9 +5,12 @@ from selenium.webdriver.common.keys import Keys
 #Your Amazon Credentials File
 from credentials import *
 
+
+
 #Define URL and Web Driver
-url = "https://sellercentral.amazon.com/inventory/ref=id_invmgr_dnav_xx_?tbla_myitable=sort:%7B%22sortOrder%22%3A%22DESCENDING%22%2C%22sortedColumnId%22%3A%22date%22%7D;search:;pagination:1;"
 driver = webdriver.Firefox()
+driver.implicitly_wait(0)
+url = "https://sellercentral.amazon.com/inventory/ref=id_invmgr_dnav_xx_?tbla_myitable=sort:%7B%22sortOrder%22%3A%22DESCENDING%22%2C%22sortedColumnId%22%3A%22date%22%7D;search:;pagination:1;"
 driver.get(url)
 
 #Login
@@ -20,39 +21,83 @@ time.sleep(5)
 password = driver.find_element_by_name("password")
 password.send_keys(amazon_password)
 time.sleep(5)
-
 password.send_keys(Keys.RETURN)
-driver.implicitly_wait(10)
 
-#Price Match Inventory
-def match_prices():
 
-    price_match = driver.find_elements_by_link_text("Match price")
-    print(len(price_match))
+## USER FUNCTIONS FOR PRICE CHANGES
 
-    for link in price_match:
+#Price Match Inventory (new)
+def match_prices(inventory_item):
+    #price_match = driver.find_elements_by_link_text("Match price")
+    #print(len(price_match))
+    for link in inventory_item:
         try:
             link.click()
             time.sleep(2)
         except:
+            print("exception")
             pass
 
 
+def beat_price(price):
+    price = float(price)
+    new_price = round(price - 0.02, 2)
+    return str(new_price)
 
-def price_war(price):
-    new_price = round(price - 0.01, 2)
-    return new_price
+
+def lower_price(inventory_item):
+
+    current_price = inventory_item.get_attribute('value')
+    print(current_price)
+    #price_war(inventory_item)
+    new_price = beat_price(current_price)
+    inventory_item.clear()
+    inventory_item.send_keys(new_price)
+    time.sleep(1)
 
 
-item_price = driver.find_element_by_name("price")
-item_price.send_keys(109.75)
+def save_changes():
+    save_all = driver.find_element_by_link_text("Save all")
+    save_all.click()
 
-print(len(driver.find_elements_by_xpath('//a')))
+## MAIN FUNCTION TO RUN PRICE WAR
 
-#match_prices(5)
+def price_war():
 
-item_price = driver.find_element_by_class_name("a-input-text main-entry mt-icon-input mt-input-text")
-item_price.send_keys(109.75)
+    #Select Only Active Inventory
+    time.sleep(2)
+    radio = driver.find_element_by_xpath("//div[@data-filter-id='Open']")
+    radio.click()
+    time.sleep(3)
 
-a-input-text main-entry mt-icon-input mt-input-text
-a-input-text main-entry mt-input-text
+    items = driver.find_elements_by_xpath("//tr[@class='mt-row']")
+    len(items)
+
+    index = -1
+    for row in items:
+        index +=1
+        better_price = row.find_elements_by_link_text("Match price")
+
+        if len(better_price) >= 1:
+            #Match price
+            print("Matching price")
+            match_prices(better_price)
+
+            #Select Inventory Item
+            inventory_item = row.find_elements_by_xpath("//input[@maxlength='23']")[index]
+            lower_price(inventory_item)
+
+        else:
+            pass
+
+    #Save Changes
+    import pdb; pdb.set_trace()
+    save_changes()
+    time.sleep(5)
+
+
+    #Close Driver
+    driver.close()
+
+if __name__=="__main__":
+    price_war()

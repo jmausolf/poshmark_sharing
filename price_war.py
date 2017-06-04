@@ -1,7 +1,6 @@
 import selenium, time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-#from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.remote.command import Command
 
@@ -10,22 +9,34 @@ from selenium.webdriver.remote.command import Command
 from credentials import *
 
 
+def login():
+    #Define URL and Web Driver
+    driver = webdriver.Firefox()
+    driver.implicitly_wait(0)
+    url = "https://sellercentral.amazon.com/inventory/ref=id_invmgr_dnav_xx_?tbla_myitable=sort:%7B%22sortOrder%22%3A%22DESCENDING%22%2C%22sortedColumnId%22%3A%22date%22%7D;search:;pagination:1;"
+    driver.get(url)
 
-#Define URL and Web Driver
-driver = webdriver.Firefox()
-driver.implicitly_wait(0)
-url = "https://sellercentral.amazon.com/inventory/ref=id_invmgr_dnav_xx_?tbla_myitable=sort:%7B%22sortOrder%22%3A%22DESCENDING%22%2C%22sortedColumnId%22%3A%22date%22%7D;search:;pagination:1;"
-driver.get(url)
+    try:
+        #Login
+        print("Logging into Amazon seller account. The price war will begin momentarily.")
+        username = driver.find_element_by_name("email")
+        username.send_keys(amazon_email)
+        time.sleep(5)
 
-#Login
-username = driver.find_element_by_name("email")
-username.send_keys(amazon_email)
-time.sleep(5)
+        password = driver.find_element_by_name("password")
+        password.send_keys(amazon_password)
+        time.sleep(5)
+        password.send_keys(Keys.RETURN)
 
-password = driver.find_element_by_name("password")
-password.send_keys(amazon_password)
-time.sleep(5)
-password.send_keys(Keys.RETURN)
+        #Check If Passed Login
+        radio = driver.find_element_by_xpath("//div[@data-filter-id='Open']")
+
+    except:
+        #Captcha Catch
+        import pdb; pdb.set_trace()
+        password = driver.find_element_by_name("password")
+        password.send_keys(amazon_password)
+        #Enter Captcha
 
 
 ## USER FUNCTIONS FOR PRICE CHANGES
@@ -52,8 +63,7 @@ def beat_price(price):
 def lower_price(inventory_item):
 
     current_price = inventory_item.get_attribute('value')
-    print(current_price)
-    #price_war(inventory_item)
+    print("Current price for item = ${}".format(current_price))
     new_price = beat_price(current_price)
     inventory_item.clear()
     inventory_item.send_keys(new_price)
@@ -84,28 +94,45 @@ def price_war():
     len(items)
 
     index = -1
+    matches = 0
     for row in items:
         index +=1
         better_price = row.find_elements_by_link_text("Match price")
 
         if len(better_price) >= 1:
             #Match price
-            print("Matching price")
+            matches += 1
+            print("Matching price for item {}".format(index))
             match_prices(better_price)
 
             #Select Inventory Item
             inventory_item = row.find_elements_by_xpath("//input[@maxlength='23']")[index]
             lower_price(inventory_item)
+            print("Lowering price for item {}".format(index))
 
         else:
             pass
 
     #Save Changes
     save_changes()
+    print("[*] Offered better prices for {} items in inventory. The price war is strong.".format(matches))
     time.sleep(5)
 
     #Close Driver
     driver.close()
 
 if __name__=="__main__":
-    price_war()
+    def deploy_price_war():
+        print("[*] DEPLOYING PRICE WAR")
+        try:
+            login()
+            price_war()
+        except:
+            print("[*] Error in Price War: Thrwarted by Captchas")
+            pass
+
+    #Start Price War Loop
+    starttime=time.time()
+    while True:
+      deploy_price_war()
+      time.sleep(3600 - ((time.time() - starttime) % 3600))

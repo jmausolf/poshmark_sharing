@@ -45,7 +45,7 @@ def match_prices(inventory_item):
 
 def beat_price(price):
     price = float(price)
-    new_price = round(price - 0.02, 2)
+    new_price = round(price - 0.01, 2)
     return str(new_price)
 
 
@@ -123,7 +123,7 @@ if __name__=="__main__":
             print("[*] Error in Price War")
             pass
 
-        print("....the price war will continue in {} minutes.".format(int(args.time/60)))
+        print("....the price war will continue in {} minutes. Current time: {}".format(int(args.time/60), time.strftime('%l:%M%p %Z on %b %d, %Y')))
 
 
     #Start Price War Loop

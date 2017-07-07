@@ -7,20 +7,25 @@ from credentials import *
 
 
 def login():
-    url = "https://sellercentral.amazon.com/inventory/ref=id_invmgr_dnav_xx_?tbla_myitable=sort:%7B%22sortOrder%22%3A%22DESCENDING%22%2C%22sortedColumnId%22%3A%22date%22%7D;search:;pagination:1;"
+    #url = "https://poshmark.com/closet/couponingstacy?availability=available"
+    url = "https://poshmark.com/login"
     driver.get(url)
 
     try:
         #Login
-        print("Logging into Amazon seller account. The price war will begin momentarily.")
-        username = driver.find_element_by_name("email")
-        username.send_keys(amazon_email)
+        print("Logging into Poshmark seller account. The price war will begin momentarily.")
+        username = driver.find_element_by_name("login_form[username_email]")
+        username.send_keys(poshmark_email)
         time.sleep(5)
 
-        password = driver.find_element_by_name("password")
-        password.send_keys(amazon_password)
+        password = driver.find_element_by_name("login_form[password]")
+        password.send_keys(poshmark_password)
         time.sleep(5)
         password.send_keys(Keys.RETURN)
+
+        #Navigate to Seller Page
+        seller_page = "https://poshmark.com/closet/couponingstacy?availability=available"
+        driver.get(seller_page)
 
     except:
         #Captcha Catch
@@ -116,9 +121,10 @@ if __name__=="__main__":
     def deploy_price_war():
         print("[*] DEPLOYING PRICE WAR")
 
+        #import pdb; pdb.set_trace()
         try:
             login()
-            price_war()
+            #price_war()
         except:
             print("[*] Error in Price War")
             pass
@@ -128,12 +134,13 @@ if __name__=="__main__":
 
     #Start Price War Loop
     starttime=time.time()
+
     while True:
         #Start Driver, Run, Close
         driver = webdriver.Firefox()
         driver.implicitly_wait(0)
         deploy_price_war()
-        time.sleep(5)
+        time.sleep(15)
         driver.close()
 
         #Time Delay: While Loop

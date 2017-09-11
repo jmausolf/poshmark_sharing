@@ -4,6 +4,7 @@ from selenium.webdriver.common.keys import Keys
 
 #Your Amazon Credentials File
 from credentials import *
+import pdb
 
 
 def login():
@@ -34,6 +35,25 @@ def login():
 
 
 ## USER FUNCTIONS FOR PRICE CHANGES
+
+#from helper_functions import *
+#Scroll Function
+def scroll_page(n):
+    scroll = 0
+    delay = 3
+    for i in range(1, n):
+        scroll +=1
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(4)
+
+    #TODO get function to scoll until end
+
+#TODO need function to get every link on page, open each link, and share
+'''
+#conceptual Loop
+
+
+'''
 
 #Price Match Inventory (new)
 def match_prices(inventory_item):
@@ -78,21 +98,43 @@ def save_changes():
 ## MAIN FUNCTION TO RUN PRICE WAR
 
 def price_war():
+    pdb.set_trace()
     #Select Only Active Inventory
     time.sleep(2)
-    radio = driver.find_element_by_xpath("//div[@data-filter-id='Open']")
-    radio.click()
+    #radio = driver.find_element_by_xpath("//div[@data-filter-id='Open']")
+    #radio.click()
     time.sleep(3)
 
-    items = driver.find_elements_by_xpath("//tr[@class='mt-row']")
+    #items = driver.find_elements_by_xpath("//tr[@class='mt-row']")
+    #Poshmark Items Links
+    items = driver.find_elements_by_xpath("//div[@class='item-details']")
+    #urls = driver.find_elements_by_xpath("//div[@class='item-details']").get_attribute('href')
+    #urls = driver.find_element_by_xpath("//div[@class='item-details']").get_attribute('href')
+    #url = item.find_element_by_css_selector('a').get_attribute('href') #works!
+    #items = driver.find_elements_by_xpath("//h4[@]")
     len(items)
+
+    url_stem = "https://poshmark.com/closet/couponingstacy?availability=available"
 
     index = -1
     matches = 0
-    for row in items:
-        index +=1
-        better_price = row.find_elements_by_link_text("Match price")
+    #for item in items:
+    for item in items:
+        #pdb.set_trace()
+        #index +=1
+        #open link and follow
+        #item.click() #how to do
+        #url = url_stem+url_ref
+        url = item.find_element_by_css_selector('a').get_attribute('href')
+        print(url)
+        driver.get(url)
+        #do stuff
+        #better_price = row.find_elements_by_link_text("Match price")
+        time.sleep(2)
+        #item.close()
+        #perhaps instead of opening and closing each as a single selenium process it would make sense to make new drivers for each window, where the url is scraped from this step
 
+        '''
         if len(better_price) >= 1:
             #Match price
             matches += 1
@@ -100,16 +142,18 @@ def price_war():
             match_prices(better_price)
 
             #Select Inventory Item
+            #div = item-details
             inventory_item = row.find_elements_by_xpath("//input[@maxlength='23']")[index]
             lower_price(inventory_item)
             print("...lowering price for item {}".format(index))
 
         else:
             pass
+        '''
 
     #Save Changes
-    save_changes()
-    print("[*] Offered better prices for {} items in inventory. The price war is strong.".format(matches))
+    #save_changes()
+    #print("[*] Offered better prices for {} items in inventory. The price war is strong.".format(matches))
 
 
 
@@ -124,7 +168,9 @@ if __name__=="__main__":
         #import pdb; pdb.set_trace()
         try:
             login()
-            #price_war()
+            import pdb; pdb.set_trace()
+            scroll_page(5)
+            price_war()
         except:
             print("[*] Error in Price War")
             pass

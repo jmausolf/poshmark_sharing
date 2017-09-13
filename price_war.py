@@ -19,6 +19,7 @@ def login():
         username.send_keys(poshmark_email)
         time.sleep(5)
 
+        pdb.set_trace()
         password = driver.find_element_by_name("login_form[password]")
         password.send_keys(poshmark_password)
         time.sleep(5)
@@ -27,6 +28,8 @@ def login():
         #Navigate to Seller Page
         seller_page = "https://poshmark.com/closet/couponingstacy?availability=available"
         driver.get(seller_page)
+        #https://poshmark.com/closet/couponingstacy
+
 
     except:
         #Captcha Catch
@@ -93,7 +96,11 @@ def save_changes():
     finally:
         pass
 
-
+def get_closet_urls():
+    items = driver.find_elements_by_xpath("//div[@class='item-details']")
+    #Get URLs from Items
+    urls = [item.find_element_by_css_selector('a').get_attribute('href') for item in items]
+    return urls
 
 ## MAIN FUNCTION TO RUN PRICE WAR
 
@@ -119,6 +126,19 @@ def price_war():
     index = -1
     matches = 0
     #for item in items:
+
+    #Get URLs from Items
+    urls = [item.find_element_by_css_selector('a').get_attribute('href') for item in items]
+	#xls_files_stems = set([f.split(".")[0] for f in os.listdir(".") if f.endswith('.xlsx')])
+
+    #Open urls
+    [driver.get(url) for url in urls]
+
+    #QC
+    urls_full = [url for url in urls if len(url) > 5]
+
+
+
     for item in items:
         #pdb.set_trace()
         #index +=1
@@ -170,12 +190,16 @@ if __name__=="__main__":
             login()
             import pdb; pdb.set_trace()
             scroll_page(5)
-            price_war()
+            urls = get_closet_urls()
+            #price_war()
+            for url in urls:
+                print(url)
+            #TODO okay, now we have logged in, gotten urls for each item in closet
         except:
             print("[*] Error in Price War")
             pass
 
-        print("....the price war will continue in {} minutes. Current time: {}".format(int(args.time/60), time.strftime('%l:%M%p %Z on %b %d, %Y')))
+        #print("....the price war will continue in {} minutes. Current time: {}".format(int(args.time/60), time.strftime('%l:%M%p %Z on %b %d, %Y')))
 
 
     #Start Price War Loop

@@ -8,9 +8,9 @@ import pdb
 
 
 def login():
-    #url = "https://poshmark.com/closet/couponingstacy?availability=available"
     url = "https://poshmark.com/login"
     driver.get(url)
+    time.sleep(5)
 
     try:
         #Login
@@ -24,12 +24,61 @@ def login():
         password.send_keys(poshmark_password)
         time.sleep(5)
         password.send_keys(Keys.RETURN)
+        time.sleep(5)
+        #import pdb; pdb.set_trace()
+        #Check for Captcha
+        try:
+            #x = driver.find_element_by_name("base_error_message")
+            captcha_fail = driver.find_element_by_xpath("//span[@class='base_error_message']")
+            #captcha_fail = driver.find_element_by_xpath("//div[@class='rc-anchor-alert']")
+            if len(str(captcha_fail)) > 100:
+                print(("[*] Caught by Captchas: Proceed to Debugger in terminal..."))
+                import pdb; pdb.set_trace()
+                print(("[*] Please complete captchas, robots game before proceeding..."))
+                login_pdb()
+                return
+            else:
+                pass
+        except:
+            pass
 
         #Navigate to Seller Page
+        time.sleep(10)
         seller_page = "https://poshmark.com/closet/couponingstacy?availability=available"
         driver.get(seller_page)
         #https://poshmark.com/closet/couponingstacy
 
+    except:
+        #Captcha Catch
+        print("[*] Error in Price War: Thrwarted by Captchas")
+        login_pdb()
+        pass
+
+def login_pdb():
+    #url = "https://poshmark.com/login"
+    #driver.get(url)
+    #time.sleep(5)
+
+    try:
+        import pdb; pdb.set_trace()
+        #pdb.set_trace()
+        #Login
+        #print("Logging into Poshmark seller account. The price war will begin momentarily.")
+        username = driver.find_element_by_name("login_form[username_email]")
+        username.clear()
+        username.send_keys(poshmark_email)
+        time.sleep(5)
+
+        #pdb.set_trace()
+        password = driver.find_element_by_name("login_form[password]")
+        password.send_keys(poshmark_password)
+        time.sleep(5)
+        password.send_keys(Keys.RETURN)
+
+        #Navigate to Seller Page
+        time.sleep(5)
+        seller_page = "https://poshmark.com/closet/couponingstacy?availability=available"
+        driver.get(seller_page)
 
     except:
         #Captcha Catch
@@ -41,18 +90,15 @@ def login():
 
 #from helper_functions import *
 #Scroll Function
-def scroll_page(n):
+def scroll_page(n, delay=3):
     scroll = 0
-    delay = 3
-    for i in range(1, n):
+    for i in range(1, n+1):
         scroll +=1
+        print("scrolling page...scroll number {} of {}".format(i, n))
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(3)
+        time.sleep(delay)
 
     #TODO get function to scoll until end
-
-#TODO need function to get every link on page, open each link, and share
-
 
 #Price Match Inventory (new)
 def match_prices(inventory_item):
@@ -98,43 +144,44 @@ def get_closet_urls():
     urls = [item.find_element_by_css_selector('a').get_attribute('href') for item in items]
     return urls
 
-def share_closet_item(url):
-    print(url)
-    driver = webdriver.Firefox()
-    driver.implicitly_wait(0)
-    #deploy_price_war()
-    #time.sleep(15)
-    driver.get(url)
-    time.sleep(5)
-    driver.close()
+def get_closet_share_icons():
+    #pdb.set_trace()
+    items = driver.find_elements_by_xpath("//div[@class='social-info d-fl ai-c jc-c']")
+    #Get URLs from Items
+    share_icons = [item.find_element_by_css_selector("a[class='share']") for item in items]
+    #share_icons = [item.find_element_by_xpath("//a[@class='share']") for item in items]
+    #share_icons[1].click()
+    #share_icons[1].send_keys(selenium.webdriver.common.keys.Keys.SPACE)
 
-def share_closet_item2(url):
+    return share_icons
+
+def clicks_share_followers(share_icon, delay=1.5):
+    d = delay
+
+    #First share click
+    driver.execute_script("arguments[0].click();", share_icon); time.sleep(d)
+
+    #Second share click
+    share_followers = driver.find_element_by_xpath("//a[@class='pm-followers-share-link grey']")
+    driver.execute_script("arguments[0].click();", share_followers); time.sleep(d)
+
+def share(d=1):
+    #shortcut to reshare in debugger mode
+    [clicks_share_followers(item, d) for item in share_icons]
+
+def open_closet_item_url(url):
     print(url)
-    #driver = webdriver.Firefox()
-    #driver.implicitly_wait(0)
-    #deploy_price_war()
-    #time.sleep(15)
     driver.get(url)
     time.sleep(5)
-    #driver.close()
+
+
 
 ## MAIN FUNCTION TO RUN PRICE WAR
 
 def price_war():
-    pdb.set_trace()
-    #Select Only Active Inventory
-    time.sleep(2)
-    #radio = driver.find_element_by_xpath("//div[@data-filter-id='Open']")
-    #radio.click()
-    time.sleep(3)
 
-    #items = driver.find_elements_by_xpath("//tr[@class='mt-row']")
     #Poshmark Items Links
     items = driver.find_elements_by_xpath("//div[@class='item-details']")
-    #urls = driver.find_elements_by_xpath("//div[@class='item-details']").get_attribute('href')
-    #urls = driver.find_element_by_xpath("//div[@class='item-details']").get_attribute('href')
-    #url = item.find_element_by_css_selector('a').get_attribute('href') #works!
-    #items = driver.find_elements_by_xpath("//h4[@]")
     len(items)
 
     url_stem = "https://poshmark.com/closet/couponingstacy?availability=available"
@@ -147,62 +194,22 @@ def price_war():
     urls = [item.find_element_by_css_selector('a').get_attribute('href') for item in items]
 	#xls_files_stems = set([f.split(".")[0] for f in os.listdir(".") if f.endswith('.xlsx')])
 
-    #Open urls
-    [driver.get(url) for url in urls]
-
-    #QC
-    urls_full = [url for url in urls if len(url) > 5]
-
-
-
     for item in items:
-        #pdb.set_trace()
-        #index +=1
-        #open link and follow
-        #item.click() #how to do
-        #url = url_stem+url_ref
         url = item.find_element_by_css_selector('a').get_attribute('href')
         print(url)
         driver.get(url)
         #do stuff
         #better_price = row.find_elements_by_link_text("Match price")
         time.sleep(2)
-        #item.close()
-        #perhaps instead of opening and closing each as a single selenium process it would make sense to make new drivers for each window, where the url is scraped from this step
 
-        '''
-        if len(better_price) >= 1:
-            #Match price
-            matches += 1
-            print("Matching price for item {}".format(index))
-            match_prices(better_price)
-
-            #Select Inventory Item
-            #div = item-details
-            inventory_item = row.find_elements_by_xpath("//input[@maxlength='23']")[index]
-            lower_price(inventory_item)
-            print("...lowering price for item {}".format(index))
-
-        else:
-            pass
-        '''
-
-    #Save Changes
-    #save_changes()
-    #print("[*] Offered better prices for {} items in inventory. The price war is strong.".format(matches))
 
 def deploy_price_war():
     print("[*] DEPLOYING PRICE WAR")
 
-    #import pdb; pdb.set_trace()
     try:
         login()
-        #import pdb; pdb.set_trace()
         scroll_page(5)
         return
-
-
-        #TODO okay, now we have logged in, gotten urls for each item in closet
     except:
         print("[*] Error in Price War")
         pass
@@ -212,29 +219,9 @@ def deploy_price_war():
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--time", default=900, type=float, help="time in seconds")
+    parser.add_argument("-t", "--time", default=3600, type=float, help="time in seconds")
     args = parser.parse_args()
 
-    '''
-    def deploy_price_war():
-        print("[*] DEPLOYING PRICE WAR")
-
-        #import pdb; pdb.set_trace()
-        try:
-            login()
-            import pdb; pdb.set_trace()
-            scroll_page(5)
-            urls = get_closet_urls()
-            #price_war()
-            for url in urls:
-                print(url)
-            #TODO okay, now we have logged in, gotten urls for each item in closet
-        except:
-            print("[*] Error in Price War")
-            pass
-
-        #print("....the price war will continue in {} minutes. Current time: {}".format(int(args.time/60), time.strftime('%l:%M%p %Z on %b %d, %Y')))
-    '''
     #deploy_price_war()
 
     #Start Price War Loop
@@ -245,21 +232,22 @@ if __name__=="__main__":
         driver = webdriver.Firefox()
         driver.implicitly_wait(0)
         deploy_price_war()
+
         urls = get_closet_urls()
-        for url in urls:
-            #print(url)
-            share_closet_item2(url)
+        share_icons = get_closet_share_icons()
+
+
+        #Share Listings
+        #[clicks_share_followers(item) for item in share_icons]
+        [clicks_share_followers(item, 3) for item in share_icons]
 
         time.sleep(5)
-        #driver.close()
 
-        #for url in urls:
-            #print(url)
-        #    share_closet_item(url)
+        #Open Listing URLs
+        #[open_closet_item_url(url) for url in urls]
 
-
-        #Start Drivers for Each URL
-
+        time.sleep(5)
+        driver.close()
 
         #Time Delay: While Loop
         time.sleep(args.time - ((time.time() - starttime) % args.time))

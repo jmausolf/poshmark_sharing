@@ -19,7 +19,7 @@ def login():
         username.send_keys(poshmark_email)
         time.sleep(5)
 
-        pdb.set_trace()
+        #pdb.set_trace()
         password = driver.find_element_by_name("login_form[password]")
         password.send_keys(poshmark_password)
         time.sleep(5)
@@ -47,16 +47,12 @@ def scroll_page(n):
     for i in range(1, n):
         scroll +=1
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(4)
+        time.sleep(3)
 
     #TODO get function to scoll until end
 
 #TODO need function to get every link on page, open each link, and share
-'''
-#conceptual Loop
 
-
-'''
 
 #Price Match Inventory (new)
 def match_prices(inventory_item):
@@ -101,6 +97,26 @@ def get_closet_urls():
     #Get URLs from Items
     urls = [item.find_element_by_css_selector('a').get_attribute('href') for item in items]
     return urls
+
+def share_closet_item(url):
+    print(url)
+    driver = webdriver.Firefox()
+    driver.implicitly_wait(0)
+    #deploy_price_war()
+    #time.sleep(15)
+    driver.get(url)
+    time.sleep(5)
+    driver.close()
+
+def share_closet_item2(url):
+    print(url)
+    #driver = webdriver.Firefox()
+    #driver.implicitly_wait(0)
+    #deploy_price_war()
+    #time.sleep(15)
+    driver.get(url)
+    time.sleep(5)
+    #driver.close()
 
 ## MAIN FUNCTION TO RUN PRICE WAR
 
@@ -175,6 +191,23 @@ def price_war():
     #save_changes()
     #print("[*] Offered better prices for {} items in inventory. The price war is strong.".format(matches))
 
+def deploy_price_war():
+    print("[*] DEPLOYING PRICE WAR")
+
+    #import pdb; pdb.set_trace()
+    try:
+        login()
+        #import pdb; pdb.set_trace()
+        scroll_page(5)
+        return
+
+
+        #TODO okay, now we have logged in, gotten urls for each item in closet
+    except:
+        print("[*] Error in Price War")
+        pass
+
+        #print("....the price war will continue in {} minutes. Current time: {}".format(int(args.time/60), time.strftime('%l:%M%p %Z on %b %d, %Y')))
 
 
 if __name__=="__main__":
@@ -182,6 +215,7 @@ if __name__=="__main__":
     parser.add_argument("-t", "--time", default=900, type=float, help="time in seconds")
     args = parser.parse_args()
 
+    '''
     def deploy_price_war():
         print("[*] DEPLOYING PRICE WAR")
 
@@ -200,18 +234,32 @@ if __name__=="__main__":
             pass
 
         #print("....the price war will continue in {} minutes. Current time: {}".format(int(args.time/60), time.strftime('%l:%M%p %Z on %b %d, %Y')))
-
+    '''
+    #deploy_price_war()
 
     #Start Price War Loop
     starttime=time.time()
 
     while True:
-        #Start Driver, Run, Close
+        #Start Driver, Get URLS, Close
         driver = webdriver.Firefox()
         driver.implicitly_wait(0)
         deploy_price_war()
-        time.sleep(15)
-        driver.close()
+        urls = get_closet_urls()
+        for url in urls:
+            #print(url)
+            share_closet_item2(url)
+
+        time.sleep(5)
+        #driver.close()
+
+        #for url in urls:
+            #print(url)
+        #    share_closet_item(url)
+
+
+        #Start Drivers for Each URL
+
 
         #Time Delay: While Loop
         time.sleep(args.time - ((time.time() - starttime) % args.time))

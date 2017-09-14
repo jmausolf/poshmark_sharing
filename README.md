@@ -51,15 +51,30 @@ In terminal run the following command: `python share_war.py`
 
 This program can also be run in Jupyter. Simply launch `jupyter notebook` in terminal and click the notebook, `PoshMark_Seller_Sharing_App.ipynb`. Once in the notebook, simply follow the instructions to run the script.
 
-## Timing
+## Options
+
+There are a variety of optional arguments for the script, including timing, closet scroll size, and closet ordering.
+
+### Timing
 
 You can adjust the timing from the command line. The default is 3600 seconds (60 minutes). Here are some examples:
 
 * Every hour: `python share_war.py -t 3600`
 * Every two hours: `python share_war.py -t 7200`
 
-## Closet Size
+### Closet Size
 
 If you have many listings, you may need to increase the number of times the application scrolls to the end of page (default, n=3), with the `-n` parameter:
 
 * Scroll 5 times: `python share_war.py -n 5`
+
+### Closet Ordering
+
+To preserve closet order, the closet items must be shared in their reverse order. To this end, the default sorting is `order=True`:
+
+* Preserve Closet Order, version 1:  `python share_war.py` 
+* Preserve Closet Order, version 2:  `python share_war.py -o True`
+
+To override this option, you can reverse order the items of the closet with the following flag, `-o False`:
+
+* Reverse Original Closet Order: `python share_war.py -o False`

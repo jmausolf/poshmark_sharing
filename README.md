@@ -1,11 +1,12 @@
-# Welcome to the Amazon Pricing
+![](https://d2zlsagv0ouax1.cloudfront.net/assets/home_page/hp-v5-logo@2x-6003c7f00d83f4df697830d18bdcf167.png)
 
+# Welcome to the Poshmark Sharing App
 
-This script is designed for users with a [seller account on the Amazon marketplace](https://services.amazon.com/content/sell-on-amazon.htm?ld=SCSOAStriplogin).
+This script is designed for users with a [seller account on Poshmark marketplace](https://poshmark.com).
 
-It is designed to automate offering the lowest price for every item in your inventory. After setup, once the script is executed, it will try to offer the lowest price every 15 minutes. You can edit the timing if you desire.
+It is designed to automate sharing the your listings for every item in your closet with all subscribers. After setup, once the script is executed, it will share your listings every 60 minutes. You can edit the timing if you desire.
 
-# Let the Price War Begin
+# Let the Share War Begin
 
 ### Prerequisites
 
@@ -18,18 +19,18 @@ It is designed to automate offering the lowest price for every item in your inve
 #### Git Clone
 
 First clone the repository in terminal:
-* `git clone https://github.com/jmausolf/amazon_pricing`
+* `git clone https://github.com/jmausolf/poshmark_sharing
 
 Change directories to enter the local repository:
-* `cd amazon_pricing`
+* `cd poshmark_sharing`
 
 #### User Credentials
 
 You will need to create a `credentials.py` file. It is recommended to simply edit the `example_credentials.py` file and rename it.
 
 ```python
-amazon_email = "myemail@gmail.com"
-amazon_password = "mysupersecret"
+poshmark_email = "myemail@gmail.com"
+poshmark_password = "mysupersecret"
 ```
 
 Edit the text in quotes to your actual username and password. Save the file and rename it credentials.py. Assuming you are in the repo directory, the bash command would be `mv example_credentials.py credentials.py` .
@@ -40,16 +41,25 @@ Edit the text in quotes to your actual username and password. Save the file and 
 
 
 
-## Run Price War App
+## Run Share War App in Terminal
 
-In terminal run the following command: `python price_war.py`
+In terminal run the following command: `python share_war.py`
 
-*Note:* If you have several versions of python, you will need to amend the above line to run your python 3 alias, e.g. `python3 price_war.py`.
+*Note:* If you have several versions of python, you will need to amend the above line to run your python 3 alias, e.g. `python3 share_war.py`.
 
+## Run the Jupyter App
+
+This program can also be run in Jupyter. Simply launch `jupyter notebook` in terminal and click the notebook, `PoshMark_Seller_Sharing_App.ipynb`. Once in the notebook, simply follow the instructions to run the script.
 
 ## Timing
 
-You can adjust the timing from the command line. The default is 900 seconds (15 minutes). Here are some examples:
+You can adjust the timing from the command line. The default is 3600 seconds (60 minutes). Here are some examples:
 
-* Every 30 minutes: `python price_war.py -t 1800`
-* Every hour: `python price_war.py -t 3600`
+* Every hour: `python share_war.py -t 3600`
+* Every two hours: `python share_war.py -t 7200`
+
+## Closet Size
+
+If you have many listings, you may need to increase the number of times the application scrolls to the end of page (default, n=3), with the `-n` parameter:
+
+* Scroll 5 times: `python share_war.py -n 5`

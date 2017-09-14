@@ -121,13 +121,18 @@ def open_closet_item_url(url):
     time.sleep(5)
 
 
-def deploy_share_war(n=3):
+def deploy_share_war(n=3, order=True):
     print("[*] DEPLOYING SHARE WAR")
 
     try:
         login()
         scroll_page(n)
         share_icons = get_closet_share_icons()
+
+        if order is True:
+            share_icons.reverse()
+        else:
+            pass
 
         print("[*] sharing PoshMark listings for {} items in closet...".format(len(share_icons)))
         print("[*] please wait...")
@@ -150,6 +155,7 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--time", default=3600, type=float, help="time in seconds")
     parser.add_argument("-n", "--number", default=3, type=int, help="number of closet scrolls")
+    parser.add_argument("-o", "--order", default=True, type=bool, help="preserve closet order")
     args = parser.parse_args()
 
     #Start Share War Loop
@@ -161,7 +167,7 @@ if __name__=="__main__":
         driver.implicitly_wait(0)
 
         #Run Main App
-        deploy_share_war(args.number)
+        deploy_share_war(args.number, args.order)
 
         time.sleep(5)
         driver.close()

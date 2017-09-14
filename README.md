@@ -4,7 +4,7 @@
 
 This script is designed for users with a [seller account on Poshmark marketplace](https://poshmark.com).
 
-It is designed to automate sharing the your listings for every item in your closet with all subscribers. After setup, once the script is executed, it will share your listings every 60 minutes. You can edit the timing if you desire.
+It is designed to automate sharing the listings for every item in your closet with all subscribers. Once the script is executed, it will share your listings every 60 minutes. You can edit the timing and other options if you desire.
 
 # Let the Share War Begin
 
@@ -49,7 +49,7 @@ In terminal run the following command: `python share_war.py`
 
 ## Run the Jupyter App
 
-This program can also be run in Jupyter. Simply launch `jupyter notebook` in terminal and click the notebook, `PoshMark_Seller_Sharing_App.ipynb`. Once in the notebook, simply follow the instructions to run the script.
+This program can also be run in Jupyter with a Python 3 kernel. Simply launch `jupyter notebook` in terminal and click the notebook, `PoshMark_Seller_Sharing_App.ipynb`. Once in the notebook, simply follow the instructions to run the script.
 
 ## Options
 

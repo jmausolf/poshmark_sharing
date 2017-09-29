@@ -99,7 +99,7 @@ def get_closet_share_icons():
     return share_icons
 
 
-def clicks_share_followers(share_icon, delay=1):
+def clicks_share_followers(share_icon, delay=3):
     d = delay
 
     #First share click

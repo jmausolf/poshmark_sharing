@@ -47,7 +47,7 @@ def login():
 
         #Navigate to Seller Page
         time.sleep(rt(10))
-        seller_page = "https://poshmark.com/closet/couponingstacy?availability=available"
+        seller_page = "https://poshmark.com/closet/{}?availability=available".format(poshmark_email)
         driver.get(seller_page)
 
     except:
@@ -75,7 +75,7 @@ def login_pdb():
 
         #Navigate to Seller Page
         time.sleep(rt(5))
-        seller_page = "https://poshmark.com/closet/couponingstacy?availability=available"
+        seller_page = "https://poshmark.com/closet/{}?availability=available".format(poshmark_email)
         driver.get(seller_page)
 
     except:

@@ -158,7 +158,7 @@ def deploy_share_war(n=3, order=True):
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--time", default=3600, type=float, help="time in seconds")
-    parser.add_argument("-n", "--number", default=3, type=int, help="number of closet scrolls")
+    parser.add_argument("-n", "--number", default=7, type=int, help="number of closet scrolls")
     parser.add_argument("-o", "--order", default=True, type=bool, help="preserve closet order")
     args = parser.parse_args()
 

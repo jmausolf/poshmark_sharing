@@ -99,7 +99,7 @@ def get_closet_urls():
 
 
 def get_closet_share_icons():
-    items = driver.find_elements_by_xpath("//div[@class='social-info d-fl ai-c jc-c']")
+    items = driver.find_elements_by_xpath("//div[@class='social-info social-actions d-fl ai-c jc-c']")
     share_icons = [item.find_element_by_css_selector("a[class='share']") for item in items]
     return share_icons
 

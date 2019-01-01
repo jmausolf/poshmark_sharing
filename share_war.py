@@ -151,8 +151,7 @@ def deploy_share_war(n=3, order=True):
         print("[*] ERROR in Share War")
         pass
 
-
-    print("[*] the share war will continue in {} minutes...current time: {}".format(int(random_loop_time/60), time.strftime('%l:%M%p %Z on %b %d, %Y')))
+    print("[*] the share war will continue in {} minutes...current time: {}".format(int(random_loop_time/60), time.strftime("%m/%d/%Y, %H:%M:%S")))
 
 
 if __name__=="__main__":

@@ -1,5 +1,5 @@
 #Enter Your Credentials Here
-#poshmark_email = "myemail@gmail.com"
+#poshmark_username = "myAccountName"
 #poshmark_password = "mysupersecret"
 
 #Rename this file "credentials.py"

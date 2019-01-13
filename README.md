@@ -31,6 +31,7 @@ You will need to create a `credentials.py` file. It is recommended to simply edi
 ```python
 poshmark_email = "myemail@gmail.com"
 poshmark_password = "mysupersecret"
+poshmark_username = "myusername"
 ```
 
 Edit the text in quotes to your actual username and password. Save the file and rename it credentials.py. Assuming you are in the repo directory, the bash command would be `mv example_credentials.py credentials.py` .
@@ -72,7 +73,7 @@ If you have many listings, you may need to increase the number of times the appl
 
 To preserve closet order, the closet items must be shared in their reverse order. To this end, the default sorting is `order=True`:
 
-* Preserve Closet Order, version 1:  `python share_war.py` 
+* Preserve Closet Order, version 1:  `python share_war.py`
 * Preserve Closet Order, version 2:  `python share_war.py -o True`
 
 To override this option, you can reverse order the items of the closet with the following flag, `-o False`:

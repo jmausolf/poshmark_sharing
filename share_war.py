@@ -1,4 +1,4 @@
-import selenium, time, argparse
+import selenium, time, argparse, sys
 import numpy as np
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -44,7 +44,7 @@ def login():
                 pass
         except:
             pass
-
+ 
         #Navigate to Seller Page
         time.sleep(rt(10))
         seller_page = "https://poshmark.com/closet/{}?availability=available".format(poshmark_email)
@@ -160,14 +160,38 @@ if __name__=="__main__":
     parser.add_argument("-t", "--time", default=3600, type=float, help="time in seconds")
     parser.add_argument("-n", "--number", default=7, type=int, help="number of closet scrolls")
     parser.add_argument("-o", "--order", default=True, type=bool, help="preserve closet order")
+    parser.add_argument("-d", "--driver", default=0, type=int, help="the preferred web driver to use (default is Chrome) For Chrome: 0 For Firefox: 1 For Edge: 2 For Safari: 3")
     args = parser.parse_args()
 
-    #Start Share War Loop
-    starttime=time.time()
+    try:
+        # Try to start driver
+        if args.driver == 0:
+            driver = webdriver.Chrome()
+        elif args.driver == 1:
+            driver = webdriver.Firefox()
+        elif args.driver == 2:
+            driver = webdriver.Edge()
+        elif args.driver == 3:
+            driver = webdriver.Safari()
+        else:
+            print("[*] ERROR Driver argument value not supported! Check the help (-h) argument for supported values.")
+    except:
+        print("[*] ERROR the selected driver is not setup correctly, make sure you can access it from the command line and try again")
+        sys.exit()
+
+    try:
+        driver
+    except NameError:
+        print("\n[*] ERROR You don't have the web driver for argument given ({}) you need to download it, go here for installation info: https://selenium-python.readthedocs.io/installation.html#drivers \n".format(args.driver))
+        sys.exit()
+    else:
+        pass
+
+    # Start Share War Loop
+    starttime = time.time()
 
     while True:
-        #Start Driver, Get URLS, Close
-        driver = webdriver.Firefox()
+        #Get URLS, Close
         driver.implicitly_wait(0)
 
         #Time Delay: While Loop

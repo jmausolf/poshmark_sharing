@@ -5,13 +5,20 @@ from selenium.webdriver.common.keys import Keys
 
 #Your Credentials File
 from credentials import *
-import pdb
+
 
 def rt(d):
     times = np.random.rand(1000)+np.random.rand(1000)+d
     return np.random.choice(times, 1).tolist()[0]
 
-def login():
+
+def login(debugger=False):
+
+    if debugger is True:
+        import pdb; pdb.set_trace()
+    else:
+        pass
+
     url = "https://poshmark.com/login"
     driver.get(url)
 
@@ -19,8 +26,10 @@ def login():
 
     try:
         #Login
-        print("[*] logging into Poshmark seller account...\
-            the share war will begin momentarily...")
+        print(textwrap.dedent('''
+            [*] logging into Poshmark seller account: {}...
+                the share war will begin momentarily...
+            '''.format(poshmark_username)))
         username = driver.find_element_by_name("login_form[username_email]")
         username.send_keys(poshmark_username)
         time.sleep(rt(5))
@@ -34,55 +43,106 @@ def login():
 
         #Check for Captcha
         try:
-            captcha_fail = driver.find_element_by_xpath("//span[@class='base_error_message']")
+            captcha_pat = "//span[@class='base_error_message']"
+            captcha_fail = driver.find_element_by_xpath(captcha_pat)
             if len(str(captcha_fail)) > 100:
-                print(("[*] Caught by Captchas: Proceed to debugger\
-                    in terminal..."))
-                import pdb; pdb.set_trace()
-                print(("[*] Please complete captchas, robots game before proceeding..."))
-                login_pdb()
+                print(textwrap.dedent('''
+                    [*] caught by captchas...
+                    [*] please complete captchas
+                        robots game before proceeding...
+                    [*] please proceed to terminal debugger
+                    '''))
+                login(debugger=True)
                 return
             else:
                 pass
-        except:
+        except Exception as e:
             pass
  
         #Navigate to Seller Page
         time.sleep(rt(10))
-        seller_page = "https://poshmark.com/closet/{}?availability=available".format(args.account)
+        seller_page = get_seller_page_url(args.account)
         driver.get(seller_page)
+
+
+        #Confirm Account to Share If Not Username
+        if args.bypass == True:
+            pass
+        else:
+            if args.account != poshmark_username:
+                confirm_account_sharing(args.account, poshmark_username)
+                if quit_input is True:
+                    return False
+                else:
+                     pass
+            else:
+                pass
+
+        return True
 
     except:
         #Captcha Catch
-        print("[*] ERROR in Share War: Thrwarted by Captchas")
-        login_pdb()
+        print(textwrap.dedent('''
+            [*] ERROR in Share War: Thrwarted by Captchas
+                you may now attempt to login with the python debugger
+            '''))
+        offer_user_quit()
+        login(debugger=True)
         pass
 
 
-def login_pdb():
+def confirm_account_sharing(account, username):
 
-    try:
-        import pdb; pdb.set_trace()
+        #Get User Input
+        print(textwrap.dedent('''
+            [*] you have requested to share
+                the items in another poshmark closet:
+                ------------------------------------
+                [*]: {}
+                ------------------------------------
+            '''.format(account)))
+        confirm_mes = (textwrap.dedent('''
+            [*] to confirm this request, enter [y]
+                to cancel and share your closet items instead enter [n] :
+            '''))
 
-        #Login
-        username = driver.find_element_by_name("login_form[username_email]")
-        username.clear()
-        username.send_keys(poshmark_username)
-        time.sleep(rt(5))
+        confirm_selection = input(confirm_mes)
+        cs = str(confirm_selection).lower()
+        if cs == 'y':
+            pass
+        elif cs == 'n':
+            #Redirect to users's closet page
+            seller_page = get_seller_page_url(username)
+            driver.get(seller_page)
+        else:
+            print('[*] you have entered an invalid selection...')
+            offer_user_quit()
+            if quit_input is True:
+                pass
+            else:
+               confirm_account_sharing(account, username)
 
-        password = driver.find_element_by_name("login_form[password]")
-        password.send_keys(poshmark_password)
-        time.sleep(rt(5))
-        password.send_keys(Keys.RETURN)
 
-        #Navigate to Seller Page
-        time.sleep(rt(5))
-        seller_page = "https://poshmark.com/closet/{}?availability=available".format(args.account)
-        driver.get(seller_page)
-
-    except:
-        print("[*] ERROR in Share War: Thrwarted by Captchas")
+def offer_user_quit():
+    #Provide Option to Quit
+    quit_mes = textwrap.dedent('''
+            [*] if you would like to quit, enter [q]
+                otherwise, enter any other key to continue
+            ''')
+    quit_selection = input(quit_mes)
+    qs = str(quit_selection).lower()
+    if qs == 'q':
+        global quit_input
+        quit_input = True
+    else:
         pass
+
+
+def get_seller_page_url(poshmark_account):
+    url_stem = 'https://poshmark.com/closet/'
+    available = '?availability=available'
+    url = '{}{}{}'.format(url_stem, poshmark_account, available)
+    return url
 
 
 def scroll_page(n, delay=3):
@@ -97,13 +157,14 @@ def scroll_page(n, delay=3):
 
 def get_closet_urls():
     items = driver.find_elements_by_xpath("//div[@class='item-details']")
-    urls = [item.find_element_by_css_selector('a').get_attribute('href') for item in items]
+    urls = [i.find_element_by_css_selector('a').get_attribute('href') for i in items]
     return urls
 
 
 def get_closet_share_icons():
-    items = driver.find_elements_by_xpath("//div[@class='social-info social-actions d-fl ai-c jc-c']")
-    share_icons = [item.find_element_by_css_selector("a[class='share']") for item in items]
+    item_pat = "//div[@class='social-info social-actions d-fl ai-c jc-c']"
+    items = driver.find_elements_by_xpath(item_pat)
+    share_icons = [i.find_element_by_css_selector("a[class='share']") for i in items]
     return share_icons
 
 
@@ -113,13 +174,9 @@ def clicks_share_followers(share_icon, d=4.5):
     driver.execute_script("arguments[0].click();", share_icon); time.sleep(rt(d))
 
     #Second share click
-    share_followers = driver.find_element_by_xpath("//a[@class='pm-followers-share-link grey']")
+    share_pat = "//a[@class='pm-followers-share-link grey']"
+    share_followers = driver.find_element_by_xpath(share_pat)
     driver.execute_script("arguments[0].click();", share_followers); time.sleep(rt(d))
-
-
-def share(d=4.5):
-    #shortcut to reshare in debugger mode
-    [clicks_share_followers(item, d) for item in share_icons]
 
 
 def open_closet_item_url(url):
@@ -130,10 +187,17 @@ def open_closet_item_url(url):
 
 def deploy_share_war(n=3, order=True):
     print("[*] DEPLOYING SHARE WAR")
-
+    
     try:
-        login()
+        #login_complete = login()
+        if login() is True:
+            pass
+        else:
+            return
+
         scroll_page(n)
+
+        #Share Icons and Order
         share_icons = get_closet_share_icons()
 
         if order is True:
@@ -141,21 +205,31 @@ def deploy_share_war(n=3, order=True):
         else:
             pass
 
-        print("[*] sharing PoshMark listings for {} items in closet...".format(len(share_icons)))
-        print("[*] please wait...")
+        #Share Message
+        print(textwrap.dedent('''
+            [*] sharing PoshMark listings for {} items in closet...
+                please wait...
+            '''.format(len(share_icons))))
 
         #Share Listings
         [clicks_share_followers(item) for item in share_icons]
 
         print("[*] closet successfully shared...posh-on...")
         pass
-
+        
     except:
         print("[*] ERROR in Share War")
         pass
+    
+    #Closing Message
+    loop_delay = int(random_loop_time/60)
+    current_time = time.strftime("%I:%M%p on %b %d, %Y")
+    print(textwrap.dedent('''
+        [*] the share war will continue in {} minutes...
+            current time: {}
+        '''.format(loop_delay, current_time)))
 
 
-    print("[*] the share war will continue in {} minutes...current time: {}".format(int(random_loop_time/60), time.strftime('%l:%M%p %Z on %b %d, %Y')))
 
 
 if __name__=="__main__":
@@ -179,17 +253,35 @@ if __name__=="__main__":
         '''),
         usage='use "python %(prog)s --help" for more information',
         formatter_class=RawTextArgumentDefaultsHelpFormatter)
-    parser.add_argument("-t", "--time", default=3600, type=float, 
+    parser.add_argument("-t", "--time", default=7200, type=float, 
         help=textwrap.dedent('''\
             loop time in seconds to repeat the code
+
             :: example, repeat in two hours:
-            :: -t 7200
+            -t 7200
             '''))
     parser.add_argument("-n", "--number", default=7, type=int, 
         help="number of closet scrolls")
     parser.add_argument("-o", "--order", default=True, type=bool, 
         help="preserve closet order")
-    parser.add_argument("-a", "--account", default=poshmark_username, type=str, help="The accounts closet you want to share (default is the account provided in the credentials file)")
+    parser.add_argument("-a", "--account", default=poshmark_username, 
+        type=str,help=textwrap.dedent('''\
+            the poshmark closet account you want to share
+            (default is the login account in credentials.py)
+
+            :: example, share another user's closet items:
+            -a another_username
+            '''))
+    parser.add_argument("-b", "--bypass", default=False, type=bool, 
+        help=textwrap.dedent('''\
+            option to bypass user confirmation
+            by default, if the account to be shared is not equal
+            to the poshmark username, the user will be prompted to 
+            confirm this selection
+
+            :: example, bypass user confirmation
+            -b True
+            '''))
     parser.add_argument("-d", "--driver", default='0', type=str, 
         help=textwrap.dedent('''\
             selenium web driver selection
@@ -197,6 +289,7 @@ if __name__=="__main__":
             of the driver or entering the numeric code 
             for that driver name as follows:
             Firefox==0, Chrome==1, Edge==2, Safari==3
+
             :: example, use Firefox:
             -d Firefox 
             -d 0
@@ -263,11 +356,16 @@ if __name__=="__main__":
         random_loop_time = rt(args.time)
 
         #Run Main App
+        quit_input = False
         deploy_share_war(args.number, args.order)
 
-        time.sleep(rt(10))
-        driver.close()
+        if quit_input is False:
+            time.sleep(rt(10))
+            driver.close()
 
-        #Time Delay: While Loop
-        time.sleep(random_loop_time - ((time.time() - starttime) % 
-            random_loop_time))
+            #Time Delay: While Loop
+            time.sleep(random_loop_time - ((time.time() - starttime) % 
+                random_loop_time))
+        else:
+            driver.close()
+            sys.exit()

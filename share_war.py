@@ -1,4 +1,4 @@
-import selenium, time, argparse, sys
+import selenium, time, argparse, sys, textwrap
 import numpy as np
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -19,7 +19,8 @@ def login():
 
     try:
         #Login
-        print("[*] logging into Poshmark seller account...the share war will begin momentarily...")
+        print("[*] logging into Poshmark seller account...\
+            the share war will begin momentarily...")
         username = driver.find_element_by_name("login_form[username_email]")
         username.send_keys(poshmark_email)
         time.sleep(rt(5))
@@ -35,7 +36,8 @@ def login():
         try:
             captcha_fail = driver.find_element_by_xpath("//span[@class='base_error_message']")
             if len(str(captcha_fail)) > 100:
-                print(("[*] Caught by Captchas: Proceed to Debugger in terminal..."))
+                print(("[*] Caught by Captchas: Proceed to debugger\
+                    in terminal..."))
                 import pdb; pdb.set_trace()
                 print(("[*] Please complete captchas, robots game before proceeding..."))
                 login_pdb()
@@ -88,7 +90,8 @@ def scroll_page(n, delay=3):
     print("[*] scrolling through all items in closet...")
     for i in range(1, n+1):
         scroll +=1
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        scroll_script = "window.scrollTo(0, document.body.scrollHeight);"
+        driver.execute_script(scroll_script)
         time.sleep(rt(delay))
 
 
@@ -156,43 +159,104 @@ def deploy_share_war(n=3, order=True):
 
 
 if __name__=="__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--time", default=3600, type=float, help="time in seconds")
-    parser.add_argument("-n", "--number", default=7, type=int, help="number of closet scrolls")
-    parser.add_argument("-o", "--order", default=True, type=bool, help="preserve closet order")
-    parser.add_argument("-d", "--driver", default=0, type=int, help="the preferred web driver to use (default is Chrome) For Chrome: 0 For Firefox: 1 For Edge: 2 For Safari: 3")
+
+    ##################################
+    ## Arguments for Script
+    ##################################
+
+    ## Default Arguments with RawTextHelpFormatter
+    class RawTextArgumentDefaultsHelpFormatter(
+            argparse.ArgumentDefaultsHelpFormatter,
+            argparse.RawTextHelpFormatter
+        ):
+            pass
+
+    parser = argparse.ArgumentParser(
+        description=textwrap.dedent('''
+        [*] Help file for share_war.py
+            from the poshmark_sharing repository:
+            https://github.com/jmausolf/poshmark_sharing
+        '''),
+        usage='use "python %(prog)s --help" for more information',
+        formatter_class=RawTextArgumentDefaultsHelpFormatter)
+    parser.add_argument("-t", "--time", default=3600, type=float, 
+        help=textwrap.dedent('''\
+            loop time in seconds to repeat the code
+            :: example, repeat in two hours:
+            :: -t 7200
+            '''))
+    parser.add_argument("-n", "--number", default=7, type=int, 
+        help="number of closet scrolls")
+    parser.add_argument("-o", "--order", default=True, type=bool, 
+        help="preserve closet order")
+    parser.add_argument("-d", "--driver", default='0', type=str, 
+        help=textwrap.dedent('''\
+            selenium web driver selection
+            drivers may be called by either entering the name
+            of the driver or entering the numeric code 
+            for that driver name as follows:
+            Firefox==0, Chrome==1, Edge==2, Safari==3
+            :: example, use Firefox:
+            -d Firefox 
+            -d 0
+
+            :: example, use Chrome:
+            -d Chrome
+            -d 1
+            '''))
+
     args = parser.parse_args()
 
-    try:
-        # Try to start driver
-        if args.driver == 0:
-            driver = webdriver.Chrome()
-        elif args.driver == 1:
-            driver = webdriver.Firefox()
-        elif args.driver == 2:
-            driver = webdriver.Edge()
-        elif args.driver == 3:
-            driver = webdriver.Safari()
-        else:
-            print("[*] ERROR Driver argument value not supported! Check the help (-h) argument for supported values.")
-    except:
-        print("[*] ERROR the selected driver is not setup correctly, make sure you can access it from the command line and try again")
-        sys.exit()
 
-    try:
-        driver
-    except NameError:
-        print("\n[*] ERROR You don't have the web driver for argument given ({}) you need to download it, go here for installation info: https://selenium-python.readthedocs.io/installation.html#drivers \n".format(args.driver))
-        sys.exit()
-    else:
-        pass
+    ##################################
+    ## Run Script
+    ##################################
 
     # Start Share War Loop
     starttime = time.time()
 
     while True:
-        #Get URLS, Close
-        driver.implicitly_wait(0)
+
+        #Select and Start Webdriver
+        try:
+            # Try to start driver
+            if args.driver == '0' or args.driver == 'Firefox':
+                driver = webdriver.Firefox()
+            elif args.driver == '1' or args.driver == 'Chrome':
+                driver = webdriver.Chrome()
+            elif args.driver == '2' or args.driver == 'Edge':
+                driver = webdriver.Edge()
+            elif args.driver == '3' or args.driver == 'Safari':
+                driver = webdriver.Safari()
+            else:
+                print(textwrap.dedent('''
+                    [*] ERROR Driver argument value not supported!
+                        Check the help (-h) argument for supported values.
+                    '''))
+
+            #Driver Implicit Wait
+            driver.implicitly_wait(0)
+
+        except NameError:
+            print(textwrap.dedent('''
+                [*] ERROR You don't have the web driver for argument
+                    given ({}) you need to download it, go here for
+                    installation info:
+                    https://selenium-python.readthedocs.io/installation.html#drivers
+                '''.format(args.driver)))
+            sys.exit()
+
+        except Exception as e:
+            print(textwrap.dedent('''
+                [*] ERROR the selected driver may not be setup correctly. 
+                    Ensure you can access it from the command line and 
+                    try again. 
+                    {}
+                '''.format(e)))
+            sys.exit()
+
+        else:
+            pass
 
         #Time Delay: While Loop
         random_loop_time = rt(args.time)
@@ -204,4 +268,5 @@ if __name__=="__main__":
         driver.close()
 
         #Time Delay: While Loop
-        time.sleep(random_loop_time - ((time.time() - starttime) % random_loop_time))
+        time.sleep(random_loop_time - ((time.time() - starttime) % 
+            random_loop_time))

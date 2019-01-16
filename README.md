@@ -29,8 +29,8 @@ Change directories to enter the local repository:
 You will need to create a `credentials.py` file. It is recommended to simply edit the `example_credentials.py` file and rename it.
 
 ```python
-poshmark_email = "myemail@gmail.com"
-poshmark_password = "mysupersecret"
+poshmark_username = "poshmarkusername"
+poshmark_password = "poshmarkpassword"
 ```
 
 Edit the text in quotes to your actual username and password. Save the file and rename it credentials.py. Assuming you are in the repo directory, the bash command would be `mv example_credentials.py credentials.py` .

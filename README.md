@@ -42,17 +42,19 @@ Edit the text in quotes to your actual username and password. Save the file and 
 To learn more about setting up the appropriate web driver, visit the Selenium web driver documentation below:
 [https://selenium-python.readthedocs.io/installation.html#drivers](https://selenium-python.readthedocs.io/installation.html#drivers)
 
-## Quick Start: Run Share War App in Terminal
+# Quick Start
+
+## Run in Terminal (Recommended)
 
 In terminal run the following command: `python share_war.py`, which will run the script with the default options (see below).
 
 *Note:* If you have several versions of python, you will need to amend the above line to run your python 3 alias, e.g. `python3 share_war.py`.
 
-## Run the Jupyter App
+## Run in Jupyter
 
 This program can also be run in Jupyter with a Python 3 kernel. Simply launch `jupyter notebook` in terminal and click the notebook, `PoshMark_Seller_Sharing_App.ipynb`. Once in the notebook, simply follow the instructions to run the script, which is configured to run the default options.
 
-## Options
+# Advanced Options
 
 There are a variety of optional arguments for the script, including timing, closet scroll size, closet ordering, the account to share, and the webdriver. To display the full range of command line arguments type `python share_war.py --help`. For convenience, these options are displayed in the Jupyter notebook and described below.
 

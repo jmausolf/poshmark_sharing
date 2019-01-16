@@ -22,7 +22,7 @@ def login():
         print("[*] logging into Poshmark seller account...\
             the share war will begin momentarily...")
         username = driver.find_element_by_name("login_form[username_email]")
-        username.send_keys(poshmark_email)
+        username.send_keys(poshmark_username)
         time.sleep(rt(5))
 
         password = driver.find_element_by_name("login_form[password]")
@@ -49,7 +49,7 @@ def login():
  
         #Navigate to Seller Page
         time.sleep(rt(10))
-        seller_page = "https://poshmark.com/closet/{}?availability=available".format(poshmark_email)
+        seller_page = "https://poshmark.com/closet/{}?availability=available".format(args.account)
         driver.get(seller_page)
 
     except:
@@ -67,7 +67,7 @@ def login_pdb():
         #Login
         username = driver.find_element_by_name("login_form[username_email]")
         username.clear()
-        username.send_keys(poshmark_email)
+        username.send_keys(poshmark_username)
         time.sleep(rt(5))
 
         password = driver.find_element_by_name("login_form[password]")
@@ -77,7 +77,7 @@ def login_pdb():
 
         #Navigate to Seller Page
         time.sleep(rt(5))
-        seller_page = "https://poshmark.com/closet/{}?availability=available".format(poshmark_email)
+        seller_page = "https://poshmark.com/closet/{}?availability=available".format(args.account)
         driver.get(seller_page)
 
     except:
@@ -189,6 +189,7 @@ if __name__=="__main__":
         help="number of closet scrolls")
     parser.add_argument("-o", "--order", default=True, type=bool, 
         help="preserve closet order")
+    parser.add_argument("-a", "--account", default=poshmark_username, type=str, help="The accounts closet you want to share (default is the account provided in the credentials file)")
     parser.add_argument("-d", "--driver", default='0', type=str, 
         help=textwrap.dedent('''\
             selenium web driver selection

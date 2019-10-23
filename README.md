@@ -11,8 +11,12 @@ It is designed to automate sharing the listings for every item in your closet wi
 ### Prerequisites
 
 * Python 3.5+
-* Firefox 46.0.1+
-* [Selenium](http://selenium-python.readthedocs.io)==2.53.6+
+* Firefox 69.0.1+
+* [Selenium](http://selenium-python.readthedocs.io)==3.141.0+
+* [Numpy](https://numpy.org/)==1.15.2+
+
+To install Python3 requirements, you may run `pip install -r requirements.txt`. You will also need a recent version of Firefox (or another webdriver of your choice). If using Firefox, you will also likely need to install `geckodriver`, which on macOS can be accomplished using [Homebrew](https://brew.sh/) with the command `brew install geckodriver` in terminal.
+
 
 ## Setup
 

@@ -67,11 +67,9 @@ You can adjust the timing from the command line. The default is 7200 seconds (12
 
 ### Closet Size
 
-If you have many listings, you may need to increase the number of times the application scrolls to the end of page (default, n=7), with the `-n` parameter:
+The latest version of this code will automatically scroll to the end of your active listings in your closet. You should no longer need to adjust the number of possible scrolls (default, n=1000). If you desired to share only part of your closet, you could descrease the number of scrolls with the `-n` parameter:
 
-* Scroll 10 times: `python share_war.py -n 10`
-
-Note that you could also decrease the amount `-n 3`, although the code will still run with the default option. 
+* Scroll only 1 times: `python share_war.py -n 1`
 
 
 ### Closet Ordering
@@ -105,6 +103,15 @@ Since the code is setup to run on a loop (by default every two hours), a safegua
 y
 ```
 This prompt will occur each time the code runs. If you are confident you want to repeatedly share another users entire closet every few hours, you can bypass this prompt with the following command line option `b True`. 
+
+
+### Random Sharing Subset
+
+If you would prefer to not share your entire closet (or another account's entire closet), you may select to share a randomly selected subset of items from all possible active items. To do so, add the parameter `-r` followed by a number to your command in the terminal:
+
+* Share 25 randomly selected items from another closet: `python share_war.py -a another_poshmark_closet -r 25`
+
+This is helpful if you would like to share some of another person's closet but not every item they have.
 
 
 ### Webdriver

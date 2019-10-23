@@ -147,12 +147,22 @@ def get_seller_page_url(poshmark_account):
 
 def scroll_page(n, delay=3):
     scroll = 0
+    screen_heights = [0]
+
     print("[*] scrolling through all items in closet...")
+
     for i in range(1, n+1):
         scroll +=1
         scroll_script = "window.scrollTo(0, document.body.scrollHeight);"
         driver.execute_script(scroll_script)
-        time.sleep(rt(delay))
+        height = driver.execute_script("return document.documentElement.scrollHeight")
+        last_height = screen_heights[-1:][0]
+
+        if height == last_height:
+            return
+        else:
+            screen_heights.append(height)
+            time.sleep(rt(delay))
 
 
 def get_closet_urls():
@@ -185,11 +195,10 @@ def open_closet_item_url(url):
     time.sleep(rt(5))
 
 
-def deploy_share_war(n=3, order=True):
+def deploy_share_war(n=3, order=True, random_subset=0):
     print("[*] DEPLOYING SHARE WAR")
     
     try:
-        #login_complete = login()
         if login() is True:
             pass
         else:
@@ -205,12 +214,29 @@ def deploy_share_war(n=3, order=True):
         else:
             pass
 
+        #Share Random Subset of Items
+        if random_subset != 0:
+            try: 
+                random_subset = int(random_subset)
+                print(textwrap.dedent('''
+                    [*] you have selected to share a random subset of {} items
+                        from all {} PoshMark listings in the closet...
+                        please wait...
+                    '''.format(random_subset, len(share_icons))))
+
+                share_icons = np.random.choice(share_icons, random_subset, replace=False).tolist()
+
+            except:
+                pass
+        else:
+            pass
+
         #Share Message
         print(textwrap.dedent('''
             [*] sharing PoshMark listings for {} items in closet...
                 please wait...
             '''.format(len(share_icons))))
-
+        
         #Share Listings
         [clicks_share_followers(item) for item in share_icons]
 
@@ -260,10 +286,12 @@ if __name__=="__main__":
             :: example, repeat in two hours:
             -t 7200
             '''))
-    parser.add_argument("-n", "--number", default=7, type=int, 
+    parser.add_argument("-n", "--number", default=1000, type=int, 
         help="number of closet scrolls")
     parser.add_argument("-o", "--order", default=True, type=bool, 
         help="preserve closet order")
+    parser.add_argument("-r", "--random_subset", default=0, type=int, 
+        help="select a random subset (number) of items to share")
     parser.add_argument("-a", "--account", default=poshmark_username, 
         type=str,help=textwrap.dedent('''\
             the poshmark closet account you want to share
@@ -357,7 +385,7 @@ if __name__=="__main__":
 
         #Run Main App
         quit_input = False
-        deploy_share_war(args.number, args.order)
+        deploy_share_war(args.number, args.order, args.random_subset)
 
         if quit_input is False:
             time.sleep(rt(10))

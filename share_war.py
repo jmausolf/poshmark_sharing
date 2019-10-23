@@ -1,10 +1,7 @@
-import selenium, time, argparse, sys, textwrap
+import selenium, time, argparse, sys, os, textwrap
 import numpy as np
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-
-#Your Credentials File
-import credentials
 
 
 def rt(d):
@@ -25,7 +22,7 @@ def login(debugger=False):
     time.sleep(rt(5))
 
     try:
-        #Login
+        ## Login
         print(textwrap.dedent('''
             [*] logging into Poshmark seller account: {}...
                 the share war will begin momentarily...
@@ -41,7 +38,7 @@ def login(debugger=False):
         password.send_keys(Keys.RETURN)
         time.sleep(rt(5))
 
-        #Check for Captcha
+        ## Check for Captcha
         try:
             captcha_pat = "//span[@class='base_error_message']"
             captcha_fail = driver.find_element_by_xpath(captcha_pat)
@@ -59,13 +56,13 @@ def login(debugger=False):
         except Exception as e:
             pass
  
-        #Navigate to Seller Page
+        ## Navigate to Seller Page
         time.sleep(rt(10))
         seller_page = get_seller_page_url(args.account)
         driver.get(seller_page)
 
 
-        #Confirm Account to Share If Not Username
+        ## Confirm Account to Share If Not Username
         if args.bypass == True:
             pass
         else:
@@ -81,7 +78,7 @@ def login(debugger=False):
         return True
 
     except:
-        #Captcha Catch
+        ## Captcha Catch
         print(textwrap.dedent('''
             [*] ERROR in Share War: Thrwarted by Captchas
                 you may now attempt to login with the python debugger
@@ -93,7 +90,7 @@ def login(debugger=False):
 
 def confirm_account_sharing(account, username):
 
-        #Get User Input
+        ## Get User Input
         print(textwrap.dedent('''
             [*] you have requested to share
                 the items in another poshmark closet:
@@ -111,7 +108,7 @@ def confirm_account_sharing(account, username):
         if cs == 'y':
             pass
         elif cs == 'n':
-            #Redirect to users's closet page
+            ## Redirect to users's closet page
             seller_page = get_seller_page_url(username)
             driver.get(seller_page)
         else:
@@ -124,7 +121,7 @@ def confirm_account_sharing(account, username):
 
 
 def offer_user_quit():
-    #Provide Option to Quit
+    ## Provide Option to Quit
     quit_mes = textwrap.dedent('''
             [*] if you would like to quit, enter [q]
                 otherwise, enter any other key to continue
@@ -180,10 +177,10 @@ def get_closet_share_icons():
 
 def clicks_share_followers(share_icon, d=4.5):
 
-    #First share click
+    ## First share click
     driver.execute_script("arguments[0].click();", share_icon); time.sleep(rt(d))
 
-    #Second share click
+    ## Second share click
     share_pat = "//a[@class='pm-followers-share-link grey']"
     share_followers = driver.find_element_by_xpath(share_pat)
     driver.execute_script("arguments[0].click();", share_followers); time.sleep(rt(d))
@@ -206,7 +203,7 @@ def deploy_share_war(n=3, order=True, random_subset=0):
 
         scroll_page(n)
 
-        #Share Icons and Order
+        ## Share Icons and Order
         share_icons = get_closet_share_icons()
 
         if order is True:
@@ -214,7 +211,7 @@ def deploy_share_war(n=3, order=True, random_subset=0):
         else:
             pass
 
-        #Share Random Subset of Items
+        ## Share Random Subset of Items
         if random_subset != 0:
             try: 
                 random_subset = int(random_subset)
@@ -231,13 +228,13 @@ def deploy_share_war(n=3, order=True, random_subset=0):
         else:
             pass
 
-        #Share Message
+        ## Share Message
         print(textwrap.dedent('''
             [*] sharing PoshMark listings for {} items in closet...
                 please wait...
             '''.format(len(share_icons))))
         
-        #Share Listings
+        ## Share Listings
         [clicks_share_followers(item) for item in share_icons]
 
         print("[*] closet successfully shared...posh-on...")
@@ -247,7 +244,7 @@ def deploy_share_war(n=3, order=True, random_subset=0):
         print("[*] ERROR in Share War")
         pass
     
-    #Closing Message
+    ## Closing Message
     loop_delay = int(random_loop_time/60)
     current_time = time.strftime("%I:%M%p on %b %d, %Y")
     print(textwrap.dedent('''
@@ -271,26 +268,46 @@ if __name__=="__main__":
         ):
             pass
 
-    # Fail gracefully if username or password not specified
+    ## Check to ensure user has created the credentials.py file
+    exists = os.path.isfile('./credentials.py')
+    if not exists:
+        print(textwrap.dedent('''
+            [*] ERROR: `credentials.py` file does not exist.
+                You may need to create the file, for example, 
+                by copying `example_credentials.py`...
+
+            [*] In terminal, enter the following command:
+                cp example_credentials.py credentials.py
+
+            [*] Then edit credentials.py with your
+                poshmark closet and password.
+                '''))
+        sys.exit()
+    else:
+        import credentials
+
+
+    ## Fail gracefully if the username or password not specified
     try:
         poshmark_username = credentials.poshmark_username
         poshmark_password = credentials.poshmark_password
     except AttributeError:
         print(textwrap.dedent('''
-            [*] ERROR: Username and/or password not specified.
-            You may need to uncomment poshmark_username and 
-            poshmark_password in credentials.py
+            [*] ERROR: Username and/or password not specified...
+            [*] You may need to uncomment poshmark_username and 
+                poshmark_password in credentials.py
             '''))
-        offer_user_quit()
+        sys.exit()
 
-    # Poshmark closet URL only works with username, so verify
-    # that the user is not using their email address to log in.
+    ## Poshmark closet URL only works with username, so verify
+    ## that the user is not using their email address to log in.
     if '@' in poshmark_username:
         print(textwrap.dedent('''
-                    [*] Do not user email address to log in.
-                    Use Poshmark username instead.
+                    [*] Do not your user email address to log in...
+                        use your Poshmark username (closet) instead...
                     '''))
-        offer_user_quit()
+        sys.exit()
+
 
     parser = argparse.ArgumentParser(
         description=textwrap.dedent('''
@@ -355,14 +372,14 @@ if __name__=="__main__":
     ## Run Script
     ##################################
 
-    # Start Share War Loop
+    ## Start Share War Loop
     starttime = time.time()
 
     while True:
 
-        #Select and Start Webdriver
+        ## Select and Start Webdriver
         try:
-            # Try to start driver
+            ## Try to start driver
             if args.driver == '0' or args.driver == 'Firefox':
                 driver = webdriver.Firefox()
             elif args.driver == '1' or args.driver == 'Chrome':
@@ -377,7 +394,7 @@ if __name__=="__main__":
                         Check the help (-h) argument for supported values.
                     '''))
 
-            #Driver Implicit Wait
+            ## Driver Implicit Wait
             driver.implicitly_wait(0)
 
         except NameError:
@@ -401,10 +418,10 @@ if __name__=="__main__":
         else:
             pass
 
-        #Time Delay: While Loop
+        ## Time Delay: While Loop
         random_loop_time = rt(args.time)
 
-        #Run Main App
+        ## Run Main App
         quit_input = False
         deploy_share_war(args.number, args.order, args.random_subset)
 
@@ -412,7 +429,7 @@ if __name__=="__main__":
             time.sleep(rt(10))
             driver.close()
 
-            #Time Delay: While Loop
+            ## Time Delay: While Loop
             time.sleep(random_loop_time - ((time.time() - starttime) % 
                 random_loop_time))
         else:

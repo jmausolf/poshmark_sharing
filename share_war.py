@@ -4,7 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 #Your Credentials File
-from credentials import *
+import credentials
 
 
 def rt(d):
@@ -270,6 +270,27 @@ if __name__=="__main__":
             argparse.RawTextHelpFormatter
         ):
             pass
+
+    # Fail gracefully if username or password not specified
+    try:
+        poshmark_username = credentials.poshmark_username
+        poshmark_password = credentials.poshmark_password
+    except AttributeError:
+        print(textwrap.dedent('''
+            [*] ERROR: Username and/or password not specified.
+            You may need to uncomment poshmark_username and 
+            poshmark_password in credentials.py
+            '''))
+        offer_user_quit()
+
+    # Poshmark closet URL only works with username, so verify
+    # that the user is not using their email address to log in.
+    if '@' in poshmark_username:
+        print(textwrap.dedent('''
+                    [*] Do not user email address to log in.
+                    Use Poshmark username instead.
+                    '''))
+        offer_user_quit()
 
     parser = argparse.ArgumentParser(
         description=textwrap.dedent('''

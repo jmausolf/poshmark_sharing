@@ -128,3 +128,11 @@ Alternative Selenium web drivers may also be specified. Drivers may be called by
 * Safari==3
 
 These must be properly installed on your system, otherwise you will encounter an error. See https://selenium-python.readthedocs.io/installation.html#drivers for further details.
+
+# FAQ
+
+### The share war was caught by captchas. What do I do? 
+
+If the share war is caught by captchas during login, you will need to solve the captchas manually and then exit the python debugger (Pdb) in your terminal by pressing 'q'. The share war will resume automatically and begin scrolling through your closet. 
+
+If the share war is caught by captchas during sharing, you will need to solve the captchas manually and then the share war with resume automatically. 

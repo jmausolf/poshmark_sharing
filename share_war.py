@@ -167,13 +167,15 @@ def get_closet_urls():
     urls = [i.find_element_by_css_selector('a').get_attribute('href') for i in items]
     return urls
 
-
 def get_closet_share_icons():
     item_pat = "//div[@class='social-info social-actions d-fl ai-c jc-c']"
     items = driver.find_elements_by_xpath(item_pat)
     share_icons = [i.find_element_by_css_selector("a[class='share']") for i in items]
+    if not share_icons:
+        item_pat = "//div[@class='d--fl ai--c social-action-bar__action social-action-bar__share']"
+        items = driver.find_elements_by_xpath(item_pat)
+        share_icons = [i.find_element_by_css_selector(".share-gray-large") for i in items]
     return share_icons
-
 
 def clicks_share_followers(share_icon, d=4.5):
 
@@ -181,10 +183,15 @@ def clicks_share_followers(share_icon, d=4.5):
     driver.execute_script("arguments[0].click();", share_icon); time.sleep(rt(d))
 
     ## Second share click
-    share_pat = "//a[@class='pm-followers-share-link grey']"
-    share_followers = driver.find_element_by_xpath(share_pat)
-    driver.execute_script("arguments[0].click();", share_followers); time.sleep(rt(d))
-
+    try:
+        share_pat = "//a[@class='pm-followers-share-link grey']"
+        share_followers = driver.find_element_by_xpath(share_pat)
+        driver.execute_script("arguments[0].click();", share_followers); time.sleep(rt(d))
+    except:
+        share_pat = "//a[@class='internal-share__link']"
+        share_followers = driver.find_element_by_xpath(share_pat)
+        driver.execute_script("arguments[0].click();", share_followers); time.sleep(rt(d))
+        
 
 def open_closet_item_url(url):
     print(url)

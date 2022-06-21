@@ -1,2 +1,2 @@
-numpy==1.15.2
+numpy==1.22.0
 selenium==3.141.0
